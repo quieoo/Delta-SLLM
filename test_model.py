@@ -1,6 +1,8 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import os
 import torch
+import torch.nn as nn
+import time
 
 def get_model_size(model_path):
     model = AutoModelForCausalLM.from_pretrained(model_path, local_files_only=True)
@@ -17,14 +19,33 @@ def get_gpu_memory():
     available_memory = total_memory - reserved_memory
     return available_memory
 
+# '猴子补丁'方法替换原本的torch.to()
+# 备份原始的 `to` 方法
+original_to = torch.nn.Module.to
 
+# 自定义的 `to` 方法
+def custom_to(self, device, *args, **kwargs):
+    start_time = time.time()
+    print(f"Transferring model to {device}...")
+
+    # 调用原始的 `to` 方法，将模型转移到指定设备
+    result = original_to(self, device, *args, **kwargs)
+
+    # 记录并打印转移所需的时间
+    end_time = time.time()
+    print(f"Model transferred to {device} in {end_time - start_time:.2f} seconds.")
+
+    return result
+
+# 替换 `torch.nn.Module.to` 方法
+torch.nn.Module.to = custom_to
 
 # 本地模型路径
 model_path = "/mnt/n0/models/falcon_1b"  # 替换为实际本地路径
-model_size = get_model_size(model_path)
-available_memory = get_gpu_memory()
-print(f"Model size: {model_size} MB")
-print(f"Available GPU memory: {available_memory} MB")
+# model_size = get_model_size(model_path)
+# available_memory = get_gpu_memory()
+# print(f"Model size: {model_size} MB")
+# print(f"Available GPU memory: {available_memory} MB")
 
 tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
 model=AutoModelForCausalLM.from_pretrained(model_path, local_files_only=True)
