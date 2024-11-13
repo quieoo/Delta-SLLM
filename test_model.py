@@ -47,7 +47,7 @@ model_path = "/public/home/shenzhaoyan/zhu/llama3.1_instruct/"  # 替换为实�
 # print(f"Model size: {model_size} MB")
 # print(f"Available GPU memory: {available_memory} MB")
 
-tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
+tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True,use_fast=False)
 model=AutoModelForCausalLM.from_pretrained(model_path, local_files_only=True)
 
 model=model.to("cuda")
