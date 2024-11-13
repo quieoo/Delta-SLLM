@@ -41,7 +41,7 @@ def custom_to(self, device, *args, **kwargs):
 torch.nn.Module.to = custom_to
 
 # 本地模型路径
-model_path = "/mnt/n0/models/falcon_1b"  # 替换为实际本地路径
+model_path = "/mnt/n0/models/llama3.1_instruct"  # 替换为实际本地路径
 # model_size = get_model_size(model_path)
 # available_memory = get_gpu_memory()
 # print(f"Model size: {model_size} MB")
